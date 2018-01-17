@@ -30,8 +30,7 @@ The hook is that the astronaut will remain in the center of the view screen at a
 
 ### Technologies
   * JavaScript
-  * Foo.js
-  * HTML5 BBaz
+  * HTML5 Baz
   * canvas
 
 ### Anticipated Challenges
@@ -57,4 +56,4 @@ The hook is that the astronaut will remain in the center of the view screen at a
   * Day Three
     * Polish
     * Polish
-    * Polish 
+    * Polish
