@@ -27,3 +27,34 @@ The hook is that the astronaut will remain in the center of the view screen at a
 
 ### Wireframe
 ![](/spacemanWF.png)
+
+### Technologies
+  * JavaScript
+  * Foo.js
+  * HTML5 BBaz
+  * canvas
+
+### Anticipated Challenges
+  * I'm thinking sprite rotation will be troublesome. I doubt it will be harder to rotate the level than the character, but if the level has moving parts that could prove challenging.
+
+### Timeline
+  * Day One
+    * Create environment
+    * Create object inside environment
+    * Create object acceleration
+    * Object collides with walls
+    * Rotation
+    * Add a collectible and collection
+    * Obstacles
+    *
+
+  * Day Two
+    * Replace mock visual assets with real visual assets
+    * Add "air noise" to jets
+    * Build challenge 1
+    * Add HUD (collectibles)
+
+  * Day Three
+    * Polish
+    * Polish
+    * Polish 
