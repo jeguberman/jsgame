@@ -1,6 +1,10 @@
 import Game from './lib/game';
 import Renderer from './lib/renderer';
 // import Controllr from './lib/controller';
+const Util = require('./util.js');
+
+const util = new Util();
+
 
 
 const trueGame = ()=>{
@@ -26,16 +30,9 @@ const falseGame = () => {
   ctx.fillRect(0, 0, stage.width, stage.height);
   // Draw a non-transformed red rectangle on the left
 
-  ctx.translate(Game.WIDTH/2, Game.HEIGHT/2);
-  ctx.fillStyle = "white";
-  ctx.beginPath();
-  ctx.arc(0, 0, 10, 0, 2 * Math.PI);
-  ctx.fill();
-  ctx.stroke();
 
-  ctx.translate(100, 0);
-  ctx.fillRect(-5, -10, 10, 20);
 
+  stage.addEventListener('mousemove', util.handleMouse);
 };
 
 
