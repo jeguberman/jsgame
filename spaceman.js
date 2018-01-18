@@ -5,7 +5,7 @@ const Util = require('./util.js');
 
 const util = new Util();
 
-
+Your models are falling into your ground,and your space bar is comboing. check to see if you are on the ground before triggering jump actions and fix the ground check;
 
 const trueGame = ()=>{
   const view = document.getElementById('view');
