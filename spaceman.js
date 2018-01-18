@@ -1,5 +1,5 @@
-const Game = require("./lib/game");
-const GameView = require("./lib/game_view.js");
+import Game from './lib/game';
+import Renderer from './lib/renderer';
 
 document.addEventListener('DOMContentLoaded',()=>{
   const view = document.getElementById('view');
@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   view.height = Game.HEIGHT;
 
   let ctx = view.getContext('2d');
-  ctx.fillStyle = 'red';
-  ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
+  const game = new Game();
+  const renderer = new Renderer(game, ctx);
+  renderer.start(ctx);
+
+
+
 });
