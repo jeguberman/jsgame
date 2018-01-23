@@ -526,8 +526,8 @@ var MovingObject = function () {
 
       color: "#ffffff",
 
-      sprite: _images2.default.movingObjectDefault,
-
+      sprite: _images2.default.unitSquare,
+      src: './assets/singleblock.png',
       static: false,
       name: undefined
 
@@ -540,7 +540,7 @@ var MovingObject = function () {
     this.maxGround = options.maxGround;
 
     this.image = new Image();
-    this.image.src = './assets/singleblock.png';
+    this.image.src = options.src;
     this.sprite = options.sprite;
 
     this.game = options.game;
@@ -576,9 +576,20 @@ var MovingObject = function () {
   }, {
     key: 'checkCollisions',
     value: function checkCollisions(obj) {
-      this.footCollision(obj);
-      this.rightCollision(obj);
-      this.leftCollision(obj);
+
+      this.gravityControl(obj);
+      this.boxCollision(obj);
+      // this.rightCollision(obj);
+      // this.leftCollision(obj);
+    }
+  }, {
+    key: 'boxCollision',
+    value: function boxCollision(obj) {
+      if (this.pos[0] + this.sprite.width > obj.pos[0] && this.pos[0] < obj.pos[0] + obj.sprite.width && this.pos[1] < obj.pos[1] + obj.sprite.height && this.pos[1] + this.sprite.height > obj.pos[1]) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }, {
     key: 'rightCollision',
@@ -622,17 +633,41 @@ var MovingObject = function () {
   }, {
     key: 'footCollision',
     value: function footCollision(obj) {
+      if (this !== obj && this.pos[1] + this.sprite.height > obj.pos[1] && this.pos[1] + this.sprite.height < obj.pos[1] + obj.sprite.height && this.pos[0] < obj.pos[0] + obj.sprite.width && this.pos[0] + this.sprite.width > obj.pos[0]) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }, {
+    key: 'gravityControl',
+    value: function gravityControl(obj) {
+
+      if (this.footCollision(obj)) {
+        this.verticalStop(obj);
+      } else {
+        this.applyGravity();
+      }
+    }
+  }, {
+    key: 'applyGravity',
+    value: function applyGravity() {
       var _this3 = this;
 
-      if (this !== obj && this.pos[1] + this.sprite.height > obj.pos[1] && this.pos[1] + this.sprite.height < obj.pos[1] + obj.sprite.height && this.pos[0] < obj.pos[0] + obj.sprite.width && this.pos[0] + this.sprite.width > obj.pos[0]) {
+      this.staticBlock(function () {
+        _this3.acc[1] = _this3.acc[1] + _this3.game.gravity;
+      });
+    }
+  }, {
+    key: 'verticalStop',
+    value: function verticalStop(obj) {
+      var _this4 = this;
+
+      if (obj.name === "ground") {
         this.vel[1] = 0;
         this.acc[1] = 0;
         this.staticBlock(function () {
-          _this3.footCorrect(obj);
-        });
-      } else {
-        this.staticBlock(function () {
-          _this3.acc[1] = _this3.acc[1] + _this3.game.gravity;
+          _this4.footCorrect(obj);
         });
       }
     }
@@ -647,11 +682,12 @@ var MovingObject = function () {
     key: 'draw',
     value: function draw(ctx) {
       // debugger
-      // ctx.save();
-      var pattern = ctx.createPattern(this.image, 'repeat');
-      ctx.fillStyle = pattern;
+      ctx.save();
+      // const pattern = ctx.createPattern(this.image, 'repeat');
+      // ctx.fillStyle = pattern;
+      ctx.fillStyle = "blue";
       ctx.fillRect(this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
-      // ctx.drawImage(this.image, this.sprite.imageX, this.sprite.imageY, this.sprite.width, this.sprite.height, this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
+      ctx.drawImage(this.image, this.sprite.imageX, this.sprite.imageY, this.sprite.width, this.sprite.height, this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
       // ctx.restore();
     }
   }]);
@@ -1220,6 +1256,10 @@ var _player = __webpack_require__(101);
 
 var _player2 = _interopRequireDefault(_player);
 
+var _coin = __webpack_require__(106);
+
+var _coin2 = _interopRequireDefault(_coin);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1231,11 +1271,21 @@ var Game = function () {
     this.allObjects = [new _player2.default({ game: this }), new _moving_object2.default({
       pos: [96, 320],
       vel: [0, 0],
-      sprite: _images2.default.leftTestGround,
+      sprite: _images2.default.ground,
       color: '#a11aaa',
       game: this,
       static: true,
-      name: "leftground"
+      name: "ground",
+      src: "assets/18X2blocks.png"
+    }), new _coin2.default({
+      pos: [208, 304],
+      vel: [0, 0],
+      color: '#a11aaa',
+      game: this,
+      static: true,
+      name: "coin",
+      src: "assets/coin.png",
+      sprite: _images2.default.coin
     })];
 
     this.player = this.allObjects[0];
@@ -1307,8 +1357,16 @@ var Game = function () {
   }, {
     key: 'step',
     value: function step(velocityScale) {
+      this.destroy();
       this.moveObjects(velocityScale);
       this.checkCollisions();
+    }
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      this.allObjects = this.allObjects.filter(function (object) {
+        return object.sprite !== _images2.default.destroy;
+      });
     }
   }, {
     key: 'moveObjects',
@@ -3526,7 +3584,7 @@ var Player = function (_MovingObject) {
     _classCallCheck(this, Player);
 
     options = (0, _merge2.default)({
-      pos: [210, 260],
+      pos: [210, 250],
       vel: [0, 0],
       acc: [0, 0],
       term: 100,
@@ -3669,8 +3727,6 @@ var Player = function (_MovingObject) {
     key: 'changeSprite',
     value: function changeSprite(newImage) {
       this.sprite = newImage;
-      this.height = this.sprite.height;
-      this.width = this.sprite.width;
     }
   }, {
     key: 'draw',
@@ -3813,23 +3869,28 @@ var Images = {
     height: 29
   },
 
-  movingObjectDefault: {
-    name: "movingObjectDefault",
+  unitSquare: {
     imageX: 0,
     imageY: 0,
-    width: 32,
-    height: 32
+    width: 16,
+    height: 16
   },
 
-  movingObjectDuckfault: {
-    name: "Duck",
-    imageX: 0,
+  coin: {
+    imageX: 2,
     imageY: 0,
-    width: 96,
-    height: 32
+    width: 12,
+    height: 16
   },
 
-  leftTestGround: {
+  destroy: {
+    imageX: 20,
+    imageY: 0,
+    width: 10,
+    height: 10
+  },
+
+  ground: {
     name: "Ground",
     imageX: 0,
     imageY: 0,
@@ -3839,6 +3900,72 @@ var Images = {
 
 };
 module.exports = Images;
+
+/***/ }),
+/* 105 */,
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _moving_object = __webpack_require__(14);
+
+var _moving_object2 = _interopRequireDefault(_moving_object);
+
+var _images = __webpack_require__(104);
+
+var _images2 = _interopRequireDefault(_images);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Coin = function (_MovingObject) {
+  _inherits(Coin, _MovingObject);
+
+  function Coin(options) {
+    _classCallCheck(this, Coin);
+
+    var _this = _possibleConstructorReturn(this, (Coin.__proto__ || Object.getPrototypeOf(Coin)).call(this, options));
+
+    _this.collected = false;
+    return _this;
+  }
+
+  _createClass(Coin, [{
+    key: 'checkCollisions',
+    value: function checkCollisions(obj) {
+      this.gravityControl(obj);
+      this.playerCollision(obj);
+      // this.rightCollision(obj);
+      // this.leftCollision(obj);
+    }
+  }, {
+    key: 'playerCollision',
+    value: function playerCollision(obj) {
+      if (this.boxCollision(obj)) {
+        if (obj.name === "player") {
+          this.sprite = _images2.default.destroy;
+        }
+      }
+    }
+  }]);
+
+  return Coin;
+}(_moving_object2.default);
+
+exports.default = Coin;
 
 /***/ })
 /******/ ]);
