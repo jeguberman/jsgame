@@ -548,14 +548,12 @@ var MovingObject = function () {
 
     this.static = options.static;
     this.name = options.name;
-
-    // this.footCollision = this.footCollision.bind(this);
   }
 
   _createClass(MovingObject, [{
     key: 'move',
-    value: function move(delta) {
-      this.vel = [this.vel[0] + delta * this.acc[0], this.vel[1] + delta * this.acc[1]];
+    value: function move(velocityScale) {
+      this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
       this.terminalVelocity();
       this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
     }
@@ -1308,15 +1306,15 @@ var Game = function () {
     }
   }, {
     key: 'step',
-    value: function step(delta) {
-      this.moveObjects(delta);
+    value: function step(velocityScale) {
+      this.moveObjects(velocityScale);
       this.checkCollisions();
     }
   }, {
     key: 'moveObjects',
-    value: function moveObjects(delta) {
+    value: function moveObjects(velocityScale) {
       this.allObjects.forEach(function (object) {
-        return object.move(delta);
+        return object.move(velocityScale);
       });
     }
   }, {
@@ -3550,7 +3548,7 @@ var Player = function (_MovingObject) {
 
     _this.image = new Image();
     _this.image.src = 'assets/mario_sprites.png';
-    _this.sprite = _images2.default.marioWalkLeftB;
+    _this.sprite = _images2.default.marioStandRight;
 
     return _this;
   }
@@ -3576,6 +3574,7 @@ var Player = function (_MovingObject) {
     key: 'inJumpOn',
     value: function inJumpOn() {
       this.inJump = true;
+      this.changeSprite(_images2.default.marioJumpRight);
     }
   }, {
     key: 'outJump',
@@ -3584,6 +3583,7 @@ var Player = function (_MovingObject) {
         this.vel[1] = 0;
       }
       this.inJump = false;
+      this.changeSprite(_images2.default.marioStandRight);
     }
   }, {
     key: 'Lwalk',
@@ -3699,16 +3699,16 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Renderer = function () {
-  function Renderer(game, ctx) {
-    _classCallCheck(this, Renderer);
+var Viewer = function () {
+  function Viewer(game, ctx) {
+    _classCallCheck(this, Viewer);
 
     this.game = game;
     this.ctx = ctx;
     this.normalTimeDelta = 1000 / game.FPS;
   }
 
-  _createClass(Renderer, [{
+  _createClass(Viewer, [{
     key: "start",
     value: function start() {
       this.lastTime = 0;
@@ -3727,13 +3727,10 @@ var Renderer = function () {
     }
   }]);
 
-  return Renderer;
+  return Viewer;
 }();
 
-// const NORMAL_TIME_FRAME_DELTA = 1000/Game.FPS;
-
-
-module.exports = Renderer;
+module.exports = Viewer;
 
 /***/ }),
 /* 103 */
@@ -3807,6 +3804,13 @@ var Images = {
     imageY: 226,
     width: 16,
     height: 27
+  },
+
+  marioJumpRight: {
+    imageX: 145,
+    imageY: 54,
+    width: 16,
+    height: 29
   },
 
   movingObjectDefault: {
