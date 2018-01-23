@@ -386,6 +386,13 @@ var Images = {
     height: 16
   },
 
+  lakitu: {
+    imageX: 100,
+    imageY: 0,
+    width: 12,
+    height: 16
+  },
+
   destroy: {
     imageX: 20,
     imageY: 0,
@@ -554,7 +561,6 @@ var MovingObject = function () {
   }, {
     key: 'gravityControl',
     value: function gravityControl(obj) {
-
       if (this.footCollision(obj)) {
         this.verticalStop(obj);
       } else {
@@ -1298,6 +1304,10 @@ var _coin = __webpack_require__(102);
 
 var _coin2 = _interopRequireDefault(_coin);
 
+var _lakitu = __webpack_require__(105);
+
+var _lakitu2 = _interopRequireDefault(_lakitu);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1315,12 +1325,17 @@ var Game = function () {
       static: true,
       name: "ground",
       src: "assets/18X2blocks.png"
+    }), new _lakitu2.default({
+      pos: [40, 50],
+      game: this,
+      static: true,
+      src: "assets/lakitu.png",
+      sprite: _images2.default.lakitu
     }), new _coin2.default({
       pos: [208, 204],
       vel: [0, 0],
       color: '#a11aaa',
       game: this,
-      static: true,
       name: "coin",
       src: "assets/coin.png",
       sprite: _images2.default.coin
@@ -3812,6 +3827,10 @@ var _images = __webpack_require__(9);
 
 var _images2 = _interopRequireDefault(_images);
 
+var _merge = __webpack_require__(16);
+
+var _merge2 = _interopRequireDefault(_merge);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3829,12 +3848,14 @@ var Coin = function (_MovingObject) {
     var _this = _possibleConstructorReturn(this, (Coin.__proto__ || Object.getPrototypeOf(Coin)).call(this, options));
 
     _this.collected = false;
+    _this.minVel = 2.2;
     return _this;
   }
 
   _createClass(Coin, [{
     key: 'checkCollisions',
     value: function checkCollisions(obj) {
+
       this.gravityControl(obj);
       this.playerCollision(obj);
     }
@@ -3848,17 +3869,29 @@ var Coin = function (_MovingObject) {
         }
       }
     }
+  }, {
+    key: 'verticalStop',
+    value: function verticalStop(obj) {
+      var _this2 = this;
 
-    // verticalStop(obj){
-    //   if(obj.name==="ground"){
-    //     this.vel[1] = this.vel[1] * -0.7;
-    //     this.acc[1] = 0;
-    //     this.staticBlock(()=>{
-    //       this.footCorrect(obj);
-    //     });
-    //   }
-    // }
-
+      if (obj.name === "ground") {
+        this.vel[1] = this.vel[1] * -0.7;
+        this.acc[1] = 0;
+        this.staticBlock(function () {
+          _this2.footCorrect(obj);
+        });
+      }
+    }
+  }, {
+    key: 'move',
+    value: function move(velocityScale) {
+      if (this.vel[0] < this.minVel && this.vel[0] > -this.minVel) {
+        this.vel[0] = this.minVel;
+      }
+      this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
+      this.terminalVelocity();
+      this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
+    }
   }]);
 
   return Coin;
@@ -3946,6 +3979,47 @@ var Util = function () {
 }();
 
 module.exports = Util;
+
+/***/ }),
+/* 105 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _merge = __webpack_require__(16);
+
+var _merge2 = _interopRequireDefault(_merge);
+
+var _moving_object = __webpack_require__(10);
+
+var _moving_object2 = _interopRequireDefault(_moving_object);
+
+var _images = __webpack_require__(9);
+
+var _images2 = _interopRequireDefault(_images);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Lakitu = function (_MovingObject) {
+  _inherits(Lakitu, _MovingObject);
+
+  function Lakitu(options) {
+    _classCallCheck(this, Lakitu);
+
+    return _possibleConstructorReturn(this, (Lakitu.__proto__ || Object.getPrototypeOf(Lakitu)).call(this, options));
+  }
+
+  return Lakitu;
+}(_moving_object2.default);
+
+module.exports = Lakitu;
 
 /***/ })
 /******/ ]);
