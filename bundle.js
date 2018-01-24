@@ -173,7 +173,21 @@ var Images = {
     height: 16
   },
 
+  lakituPuff: {
+    imageX: 258,
+    imageY: 40,
+    width: 28,
+    height: 34
+  },
+
   lakituA: {
+    imageX: 156,
+    imageY: 0,
+    width: 26,
+    height: 36
+  },
+
+  lakituInit: {
     imageX: 156,
     imageY: 0,
     width: 26,
@@ -194,7 +208,18 @@ var Images = {
     height: 38
   },
 
+  spinyWalkLeft: {},
+
+  spinyWalkRight: {},
+
   spinyRollA: {
+    imageX: 67,
+    imageY: 3,
+    width: 16,
+    height: 16
+  },
+
+  spinyRollB: {
     imageX: 67,
     imageY: 3,
     width: 16,
@@ -1468,7 +1493,8 @@ var Game = function () {
       src: "assets/18X2blocks.png"
     }), new _lakitu2.default({
       pos: [100, 105],
-      game: this
+      game: this,
+      sprite: _images2.default.lakituInit
     }), new _spiny2.default({
       pos: [150, 240],
       game: this,
@@ -1579,6 +1605,9 @@ var Game = function () {
   }, {
     key: 'moveObjects',
     value: function moveObjects(velocityScale) {
+      console.log(Math.max(this.allObjects.map(function (el) {
+        return el.vel[0];
+      })));
       if (!this.gameOver) {
         this.allObjects.forEach(function (object) {
           return object.move(velocityScale);
@@ -3797,7 +3826,7 @@ var Player = function (_MovingObject) {
     _classCallCheck(this, Player);
 
     options = (0, _merge2.default)({
-      pos: [110, 250],
+      pos: [120, 400],
       vel: [0, 0],
       acc: [0, 0],
       term: 100,
@@ -3820,6 +3849,8 @@ var Player = function (_MovingObject) {
     _this.image = new Image();
     _this.image.src = 'assets/mario_sprites.png';
     _this.sprite = _images2.default.marioStandRight;
+
+    _this.static = true;
 
     return _this;
   }
@@ -3988,6 +4019,10 @@ var _coin = __webpack_require__(32);
 
 var _coin2 = _interopRequireDefault(_coin);
 
+var _spiny = __webpack_require__(104);
+
+var _spiny2 = _interopRequireDefault(_spiny);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4008,6 +4043,7 @@ var Lakitu = function (_MovingObject) {
     _this.term = 3;
 
     _this.safeWindow = 1500;
+    _this.safeWindow = 500;
 
     _this.toss = _this.toss.bind(_this);
     _this.changeSprite = _this.changeSprite.bind(_this);
@@ -4017,10 +4053,12 @@ var Lakitu = function (_MovingObject) {
 
     _this.static = true;
     _this.image.src = "assets/lakitu.png";
-    _this.sprite = _images2.default.lakituA;
     _this.nextThing = _this.spawnCoin();
     _this.loadThing();
 
+    setTimeout(function () {
+      return _this.changeSprite();
+    }, 550);
     setTimeout(function () {
       return _this.toss(_this.nextThing);
     }, _this.safeWindow);
@@ -4032,7 +4070,7 @@ var Lakitu = function (_MovingObject) {
     key: 'toss',
     value: function toss() {
       if (!this.game.gameOver) {
-        this.thingGetsLakituPos();
+        this.giveNextThingPos();
         this.changeSprite();
         this.tossThing(this.nextThing);
         this.setNewSafeWindow();
@@ -4041,8 +4079,8 @@ var Lakitu = function (_MovingObject) {
       }
     }
   }, {
-    key: 'thingGetsLakituPos',
-    value: function thingGetsLakituPos() {
+    key: 'giveNextThingPos',
+    value: function giveNextThingPos() {
       this.nextThing.pos = this.pos;
     }
   }, {
@@ -4076,7 +4114,7 @@ var Lakitu = function (_MovingObject) {
     value: function loadThing() {
       switch (Math.floor(Math.random() * 3)) {
         case (0, 1):
-          this.nextThing = this.spawnCoin();
+          this.nextThing = this.spawnSpiny();
           break;
         case 2:
           this.nextThing = this.spawnCoin();
@@ -4085,12 +4123,20 @@ var Lakitu = function (_MovingObject) {
           this.nextThing = this.spawnCoin();
           break;
       }
+      // this.nextThing = this.spawnSpiny();
     }
   }, {
     key: 'spawnCoin',
     value: function spawnCoin() {
       return new _coin2.default({
-        pos: null,
+        vel: [this.vel[0], -3],
+        game: this.game
+      });
+    }
+  }, {
+    key: 'spawnSpiny',
+    value: function spawnSpiny() {
+      return new _spiny2.default({
         vel: [this.vel[0], -3],
         game: this.game
       });
@@ -4099,16 +4145,25 @@ var Lakitu = function (_MovingObject) {
     key: 'spawnLakitu',
     value: function spawnLakitu() {
       return new Lakitu({
-        pos: [this.pos[0] + 1, this.pos[1] + 1],
-        vel: [this.vel[0] * -1, -2],
+        pos: [this.pos[0], 115],
+        vel: [this.vel[0] * -0.8, 0],
         game: this.game
+        // image: Images.lakituPuff
       });
+    }
+  }, {
+    key: 'brotherYPosition',
+    value: function brotherYPosition() {
+      return this.pos[0] > 115 ? 120 : 105;
     }
   }, {
     key: 'setNewSafeWindow',
     value: function setNewSafeWindow() {
       this.safeWindow = (Math.floor(Math.random() * 4) + 1.2) * 400;
     }
+  }, {
+    key: 'keepInBoundary',
+    value: function keepInBoundary() {}
   }, {
     key: 'move',
     value: function move(velocityScale) {
@@ -4174,6 +4229,7 @@ var Spiny = function (_MovingObject) {
 
     _this.image.src = "assets/lakitu.png";
     _this.sprite = _images2.default.spinyRollA;
+    _this.minVel = 1;
     _this.name = "spiny";
     _this.inroll = true;
     _this.center = _this.pos.map(function (el) {
@@ -4208,6 +4264,25 @@ var Spiny = function (_MovingObject) {
       var least = Math.min(this.center[axis], obj.pos[axis] + obj.sprite[dim]);
       var comperand = Math.max(obj.pos[axis], least);
       return this.center[axis] - comperand;
+    }
+  }, {
+    key: 'ensureHorizontalMovement',
+    value: function ensureHorizontalMovement() {
+      if (!this.game.gameOver) {
+        if (this.vel[0] < this.minVel && this.vel[0] >= 0) {
+          this.vel[0] = this.minVel;
+        } else if (this.vel[0] > -this.minVel && this.vel[0] < 0) {
+          this.vel[0] = this.minVel * -1;
+        }
+      }
+    }
+  }, {
+    key: 'move',
+    value: function move(velocityScale) {
+      this.ensureHorizontalMovement();
+      this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
+      this.terminalVelocity();
+      this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
     }
   }]);
 
