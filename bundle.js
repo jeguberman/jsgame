@@ -4263,7 +4263,9 @@ var Lakitu = function (_MovingObject) {
   }, {
     key: 'loadThing',
     value: function loadThing() {
-      switch (Math.floor(Math.random() * 3)) {
+      var die = Math.floor(Math.random() * 3);
+      console.log(die);
+      switch (die) {
         case (0, 1):
           this.nextThing = this.spawnSpiny();
           break;
@@ -4362,6 +4364,10 @@ var _game = __webpack_require__(35);
 
 var _game2 = _interopRequireDefault(_game);
 
+var _menu = __webpack_require__(107);
+
+var _menu2 = _interopRequireDefault(_menu);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4440,6 +4446,21 @@ var Util = function () {
 }();
 
 module.exports = Util;
+
+/***/ }),
+/* 107 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Menu = function Menu() {
+  _classCallCheck(this, Menu);
+};
+
+module.exports = Menu;
 
 /***/ })
 /******/ ]);
