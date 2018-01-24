@@ -1341,18 +1341,7 @@ var Game = function () {
       src: "assets/18X2blocks.png"
     }), new _lakitu2.default({
       pos: [100, 105],
-      game: this,
-      static: true,
-      src: "assets/lakitu.png",
-      sprite: _images2.default.lakituA
-    }), new _coin2.default({
-      pos: [208, 204],
-      vel: [0, 0],
-      color: '#a11aaa',
-      game: this,
-      name: "coin",
-      src: "assets/coin.png",
-      sprite: _images2.default.coin
+      game: this
     })];
 
     this.player = this.allObjects[0];
@@ -1362,6 +1351,8 @@ var Game = function () {
 
     this.bg = new Image();
     this.bg.src = 'assets/SNES - Super Mario World - Backgrounds.png';
+
+    this.lakitus = 0;
 
     this.coincount = 0;
     this.coincountDisplay = $("#coincount");
@@ -1442,7 +1433,7 @@ var Game = function () {
     key: 'destroy',
     value: function destroy() {
       this.allObjects = this.allObjects.filter(function (object) {
-        return object.sprite !== _images2.default.destroy;
+        return object.sprite !== _images2.default.destroy && object.pos[1] < Game.HEIGHT;
       });
     }
   }, {
@@ -1466,6 +1457,7 @@ var Game = function () {
   }, {
     key: 'draw',
     value: function draw(ctx) {
+      console.log(this.allObjects.length);
       ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
       ctx.drawImage(this.bg, -515, -435);
       ctx.fillStyle = Game.BG_COLOR;
@@ -3673,7 +3665,7 @@ var Player = function (_MovingObject) {
 
     var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, options));
 
-    _this.jumpAcc = -13;
+    _this.jumpAcc = -15;
     _this.walkAcc = 0.4;
     _this.inJump = false;
     _this.inWalk = false;
@@ -3870,6 +3862,9 @@ var Coin = function (_MovingObject) {
 
     _this.collected = false;
     _this.minVel = 2.2;
+    _this.name = "coin";
+    _this.image.src = "assets/coin.png";
+    _this.sprite = _images2.default.coin;
     return _this;
   }
 
@@ -3906,8 +3901,10 @@ var Coin = function (_MovingObject) {
   }, {
     key: 'move',
     value: function move(velocityScale) {
-      if (this.vel[0] < this.minVel && this.vel[0] > -this.minVel) {
+      if (this.vel[0] < this.minVel && this.vel[0] > 0) {
         this.vel[0] = this.minVel;
+      } else if (this.vel[0] > -this.minVel && this.vel[0] < 0) {
+        this.vel[0] = this.minVel * -1;
       }
       this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
       this.terminalVelocity();
@@ -3941,6 +3938,10 @@ var _images = __webpack_require__(3);
 
 var _images2 = _interopRequireDefault(_images);
 
+var _coin = __webpack_require__(102);
+
+var _coin2 = _interopRequireDefault(_coin);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3957,19 +3958,93 @@ var Lakitu = function (_MovingObject) {
 
     var _this = _possibleConstructorReturn(this, (Lakitu.__proto__ || Object.getPrototypeOf(Lakitu)).call(this, options));
 
+    _this.game.lakitus += 1;
     _this.term = 3;
 
     _this.safeWindow = 1500;
+
     _this.toss = _this.toss.bind(_this);
     _this.changeSprite = _this.changeSprite.bind(_this);
-    setTimeout(_this.toss, _this.safeWindow);
+    _this.spawnLakitu = _this.spawnLakitu.bind(_this);
+    _this.addLakitu = _this.addLakitu.bind(_this);
+    _this.thunkish = _this.thunkish.bind(_this);
+    _this.maxLakitus = 4;
+
+    _this.static = true;
+    _this.image.src = "assets/lakitu.png";
+    _this.sprite = _images2.default.lakituA;
+    _this.nextThing = _this.spawnCoin();
+    _this.readyThing();
+
+    setTimeout(function () {
+      return _this.toss(_this.nextThing);
+    }, _this.safeWindow);
+    setTimeout(_this.addLakitu, 10000);
     return _this;
   }
 
   _createClass(Lakitu, [{
+    key: 'thunkish',
+    value: function thunkish() {
+      //sometimes they aren't throwing coins. you created this function to make sure you aren't hitting the initialized setTimeout twice. make spinies next
+      this.toss(this.nextThing);
+    }
+  }, {
     key: 'toss',
     value: function toss() {
+      this.readyThing();
       this.changeSprite();
+      this.createThing(this.nextThing);
+      setTimeout(this.toss, this.safeWindow);
+    }
+  }, {
+    key: 'createThing',
+    value: function createThing(obj) {
+      if (this.game.allObjects.length < 20) {
+        this.game.allObjects.push(obj);
+      }
+    }
+  }, {
+    key: 'addLakitu',
+    value: function addLakitu() {
+      if (this.game.lakitus < this.maxLakitus) {
+        this.changeSprite();
+        this.createThing(this.spawnLakitu());
+      }
+    }
+  }, {
+    key: 'readyThing',
+    value: function readyThing() {
+      switch (Math.floor(Math.random() * 3)) {
+        case (0, 1):
+          this.nextThing = this.spawnCoin();
+          break;
+        case 2:
+          this.nextThing = this.spawnCoin();
+          break;
+        case 3:
+          this.nextThing = this.spawnCoin();
+          break;
+      }
+    }
+  }, {
+    key: 'spawnCoin',
+    value: function spawnCoin() {
+      return new _coin2.default({
+        pos: this.pos,
+        vel: [this.vel[0], -3],
+        game: this.game
+      });
+    }
+  }, {
+    key: 'spawnLakitu',
+    value: function spawnLakitu() {
+
+      return new Lakitu({
+        pos: [this.pos[0] + 1, this.pos[1] + 1],
+        vel: [this.vel[0] * -1, -2],
+        game: this.game
+      });
     }
   }, {
     key: 'changeSprite',
@@ -3980,7 +4055,6 @@ var Lakitu = function (_MovingObject) {
         setTimeout(this.changeSprite, 650);
       } else {
         this.sprite = _images2.default.lakituA;
-        setTimeout(this.toss, this.safeWindow);
       }
     }
   }, {
@@ -4002,6 +4076,10 @@ var Lakitu = function (_MovingObject) {
         this.acc[1] = 0.07 * (1 - this.pos[1] / 115);
       } else if (this.pos[1] > 115) {
         this.acc[1] = -0.07 * (1 - 115 / this.pos[1]);
+      }
+
+      if (this.pos[1] > 200) {
+        this.pos[1] = 200;
       }
       this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
       this.terminalVelocity();
