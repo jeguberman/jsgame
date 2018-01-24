@@ -131,6 +131,13 @@ var Images = {
     height: 28
   },
 
+  marioDead: {
+    imageX: 401,
+    imageY: 0,
+    width: 16,
+    height: 26
+  },
+
   marioStandLeft: {
     imageX: 457,
     imageY: 225,
@@ -227,6 +234,13 @@ var Images = {
   },
 
   destroy: {
+    imageX: 20,
+    imageY: 0,
+    width: 10,
+    height: 10
+  },
+
+  null: {
     imageX: 20,
     imageY: 0,
     width: 10,
@@ -350,10 +364,8 @@ var MovingObject = function () {
     value: function fullStop() {
       this.acc = [0, 0];
       this.vel = [0, 0];
+      this.static = true;
     }
-  }, {
-    key: 'deathMotions',
-    value: function deathMotions() {}
   }, {
     key: 'footCorrect',
     value: function footCorrect(obj) {
@@ -393,7 +405,7 @@ var MovingObject = function () {
     value: function verticalStop(obj) {
       var _this2 = this;
 
-      if (obj.name === "ground") {
+      if (obj.name === "ground" && !this.game.gameOver) {
         this.vel[1] = 0;
         this.acc[1] = 0;
         this.staticBlock(function () {
@@ -416,7 +428,7 @@ var MovingObject = function () {
       // const pattern = ctx.createPattern(this.image, 'repeat');
       // ctx.fillStyle = pattern;
       ctx.fillStyle = "blue";
-      ctx.fillRect(this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
+      // ctx.fillRect (this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
       ctx.drawImage(this.image, this.sprite.imageX, this.sprite.imageY, this.sprite.width, this.sprite.height, this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
       // ctx.restore();
     }
@@ -1375,10 +1387,12 @@ var Coin = function (_MovingObject) {
   }, {
     key: 'move',
     value: function move(velocityScale) {
-      this.ensureHorizontalMovement();
-      this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
-      this.terminalVelocity();
-      this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
+      if (!this.gameOver) {
+        this.ensureHorizontalMovement();
+        this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
+        this.terminalVelocity();
+        this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
+      }
     }
   }]);
 
@@ -1474,6 +1488,10 @@ var _spiny = __webpack_require__(104);
 
 var _spiny2 = _interopRequireDefault(_spiny);
 
+var _dead_player = __webpack_require__(107);
+
+var _dead_player2 = _interopRequireDefault(_dead_player);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1496,7 +1514,7 @@ var Game = function () {
       game: this,
       sprite: _images2.default.lakituInit
     }), new _spiny2.default({
-      pos: [150, 240],
+      pos: [180, 280],
       game: this,
       static: true
     })];
@@ -1540,44 +1558,48 @@ var Game = function () {
     key: 'handleKeyup',
     value: function handleKeyup(key) {
       // console.log("up " + key)
-      switch (key) {
-        case 'ArrowLeft':
-          this.player.LbrakeOn();
-          break;
-        case 'ArrowRight':
-          this.player.RbrakeOn();
-          break;
-        case 'a':
-          this.player.LbrakeOn();
-          break;
-        case 'd':
-          this.player.RbrakeOn();
-          break;
-        case ' ':
-          this.player.outJump();
-          break;
+      if (!this.gameOver) {
+        switch (key) {
+          case 'ArrowLeft':
+            this.player.LbrakeOn();
+            break;
+          case 'ArrowRight':
+            this.player.RbrakeOn();
+            break;
+          case 'a':
+            this.player.LbrakeOn();
+            break;
+          case 'd':
+            this.player.RbrakeOn();
+            break;
+          case ' ':
+            this.player.outJump();
+            break;
+        }
       }
     }
   }, {
     key: 'handleKeydown',
     value: function handleKeydown(key) {
       // console.log("down " + key)
-      switch (key) {
-        case 'ArrowLeft':
-          this.player.Lwalk();
-          break;
-        case 'ArrowRight':
-          this.player.Rwalk(1);
-          break;
-        case 'a':
-          this.player.Lwalk();
-          break;
-        case 'd':
-          this.player.Rwalk(1);
-          break;
-        case ' ':
-          this.player.jump();
-          break;
+      if (!this.gameOver) {
+        switch (key) {
+          case 'ArrowLeft':
+            this.player.Lwalk();
+            break;
+          case 'ArrowRight':
+            this.player.Rwalk(1);
+            break;
+          case 'a':
+            this.player.Lwalk();
+            break;
+          case 'd':
+            this.player.Rwalk(1);
+            break;
+          case ' ':
+            this.player.jump();
+            break;
+        }
       }
     }
   }, {
@@ -1585,7 +1607,9 @@ var Game = function () {
     value: function step(velocityScale) {
       this.destroy();
       this.moveObjects(velocityScale);
-      this.checkCollisions();
+      if (!this.gameOver) {
+        this.checkCollisions();
+      }
     }
   }, {
     key: 'destroy',
@@ -1597,24 +1621,24 @@ var Game = function () {
   }, {
     key: 'triggerGameOver',
     value: function triggerGameOver() {
-      this.gameOver = true;
-      this.allObjects.forEach(function (object) {
-        return object.fullStop();
-      });
+      if (!this.gameOver) {
+        this.gameOver = true;
+        this.gravity = 0.5;
+        this.allObjects.push(this.allObjects.shift());
+        this.allObjects.forEach(function (object) {
+          return object.fullStop();
+        });
+        this.player.gameOver();
+      }
     }
   }, {
     key: 'moveObjects',
     value: function moveObjects(velocityScale) {
-      console.log(Math.max(this.allObjects.map(function (el) {
-        return el.vel[0];
-      })));
-      if (!this.gameOver) {
-        this.allObjects.forEach(function (object) {
-          return object.move(velocityScale);
-        });
-      } else {
-        this.player.deathMotions();
-      }
+      // console.log(Math.max(this.allObjects.map((el)=>el.vel[0])));
+
+      this.allObjects.forEach(function (object) {
+        return object.move(velocityScale);
+      });
     }
   }, {
     key: 'checkCollisions',
@@ -1630,7 +1654,7 @@ var Game = function () {
   }, {
     key: 'draw',
     value: function draw(ctx) {
-      console.log(this.allObjects.length);
+      // console.log(this.allObjects.length);
       ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
       ctx.drawImage(this.bg, -515, -435);
       ctx.fillStyle = Game.BG_COLOR;
@@ -3826,7 +3850,7 @@ var Player = function (_MovingObject) {
     _classCallCheck(this, Player);
 
     options = (0, _merge2.default)({
-      pos: [120, 400],
+      pos: [120, 300],
       vel: [0, 0],
       acc: [0, 0],
       term: 100,
@@ -3850,12 +3874,41 @@ var Player = function (_MovingObject) {
     _this.image.src = 'assets/mario_sprites.png';
     _this.sprite = _images2.default.marioStandRight;
 
-    _this.static = true;
+    _this.deathFall = _this.deathFall.bind(_this);
+
+    // this.static = true;
 
     return _this;
   }
 
   _createClass(Player, [{
+    key: 'gameOver',
+    value: function gameOver() {
+      this.sprite = _images2.default.marioDead;
+      this.static = true;
+      setTimeout(this.deathFall, 300);
+    }
+  }, {
+    key: 'deathFall',
+    value: function deathFall() {
+      this.static = false;
+      this.vel[1] = -8;
+      this.acc[1] = this.game.gravity;
+    }
+  }, {
+    key: 'verticalStop',
+    value: function verticalStop(obj) {
+      var _this2 = this;
+
+      if (obj.name === "ground") {
+        this.vel[1] = 0;
+        this.acc[1] = 0;
+        this.staticBlock(function () {
+          _this2.footCorrect(obj);
+        });
+      }
+    }
+  }, {
     key: 'speedLessThanMaxGround',
     value: function speedLessThanMaxGround() {
       if (this.vel[0] < this.maxGround && this.vel[0] > this.maxGround * -1) {
@@ -4163,10 +4216,7 @@ var Lakitu = function (_MovingObject) {
     }
   }, {
     key: 'keepInBoundary',
-    value: function keepInBoundary() {}
-  }, {
-    key: 'move',
-    value: function move(velocityScale) {
+    value: function keepInBoundary() {
       var n = 50;
       if (this.pos[0] < 220 - n) {
         this.acc[0] = 0.09;
@@ -4183,9 +4233,17 @@ var Lakitu = function (_MovingObject) {
       if (this.pos[1] > 200) {
         this.pos[1] = 200;
       }
-      this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
-      this.terminalVelocity();
-      this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
+    }
+  }, {
+    key: 'move',
+    value: function move(velocityScale) {
+      if (!this.game.gameOver) {
+        this.keepInBoundary();
+
+        this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
+        this.terminalVelocity();
+        this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
+      }
     }
   }]);
 
@@ -4232,10 +4290,9 @@ var Spiny = function (_MovingObject) {
     _this.minVel = 1;
     _this.name = "spiny";
     _this.inroll = true;
-    _this.center = _this.pos.map(function (el) {
-      return el + 8;
-    });
+
     _this.collisionType = "radial";
+    _this.updateCenter();
     return _this;
   }
 
@@ -4277,12 +4334,22 @@ var Spiny = function (_MovingObject) {
       }
     }
   }, {
+    key: 'updateCenter',
+    value: function updateCenter() {
+      this.center = this.pos.map(function (el) {
+        return el + 8;
+      });
+    }
+  }, {
     key: 'move',
     value: function move(velocityScale) {
-      this.ensureHorizontalMovement();
-      this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
-      this.terminalVelocity();
-      this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
+      if (!this.gameOver) {
+        this.updateCenter();
+        this.ensureHorizontalMovement();
+        this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
+        this.terminalVelocity();
+        this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
+      }
     }
   }]);
 
@@ -4371,6 +4438,39 @@ var Util = function () {
 }();
 
 module.exports = Util;
+
+/***/ }),
+/* 107 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _moving_object = __webpack_require__(3);
+
+var _moving_object2 = _interopRequireDefault(_moving_object);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DeadPlayer = function (_MovingObject) {
+  _inherits(DeadPlayer, _MovingObject);
+
+  function DeadPlayer() {
+    _classCallCheck(this, DeadPlayer);
+
+    return _possibleConstructorReturn(this, (DeadPlayer.__proto__ || Object.getPrototypeOf(DeadPlayer)).apply(this, arguments));
+  }
+
+  return DeadPlayer;
+}(_moving_object2.default);
+
+module.exports = DeadPlayer;
 
 /***/ })
 /******/ ]);
