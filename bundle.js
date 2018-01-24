@@ -1631,15 +1631,11 @@ var Game = function () {
     this.coincountDisplay = $("#coincount");
     this.coincountDisplay.text(this.coincount);
     this.gameOver = false;
+    this.restart = false;
+    this.triggerRestart = this.triggerRestart.bind(this);
   }
 
   _createClass(Game, [{
-    key: 'incrementCoincount',
-    value: function incrementCoincount() {
-      this.coincount += 1;
-      this.coincountDisplay.text(this.coincount);
-    }
-  }, {
     key: 'controls',
     value: function controls() {
       var _this = this;
@@ -1703,6 +1699,7 @@ var Game = function () {
   }, {
     key: 'step',
     value: function step(velocityScale) {
+      // console.log(this.allObjects[this.allObjects.length-1].name);
       this.destroy();
       this.moveObjects(velocityScale);
       if (!this.gameOver) {
@@ -1727,7 +1724,13 @@ var Game = function () {
           return object.fullStop();
         });
         this.player.gameOver();
+        setTimeout(this.triggerRestart, 10000);
       }
+    }
+  }, {
+    key: 'triggerRestart',
+    value: function triggerRestart() {
+      this.restart = true;
     }
   }, {
     key: 'moveObjects',
@@ -1737,6 +1740,12 @@ var Game = function () {
       this.allObjects.forEach(function (object) {
         return object.move(velocityScale);
       });
+    }
+  }, {
+    key: 'incrementCoincount',
+    value: function incrementCoincount() {
+      this.coincount += 1;
+      this.coincountDisplay.text(this.coincount);
     }
   }, {
     key: 'checkCollisions',
@@ -4264,7 +4273,7 @@ var Lakitu = function (_MovingObject) {
     key: 'loadThing',
     value: function loadThing() {
       var die = Math.floor(Math.random() * 3);
-      console.log(die);
+      // console.log(die)
       switch (die) {
         case (0, 1):
           this.nextThing = this.spawnSpiny();
@@ -4394,12 +4403,20 @@ var Viewer = function () {
       this.game.draw(this.ctx);
     }
   }, {
+    key: 'checkForGameOver',
+    value: function checkForGameOver() {
+      if (this.game.restart === true) {
+        this.game = new _game2.default();
+      }
+    }
+  }, {
     key: 'animate',
     value: function animate(time) {
       var timeDelta = time - this.lastTime;
       var idealDelta = 1000 / 60;
       var velocityScale = timeDelta / idealDelta;
       this.renderGame(velocityScale);
+      this.checkForGameOver();
       this.lastTime = time;
       requestAnimationFrame(this.animate.bind(this));
     }
