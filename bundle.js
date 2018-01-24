@@ -439,7 +439,7 @@ var MovingObject = function () {
       ctx.save();
       // const pattern = ctx.createPattern(this.image, 'repeat');
       // ctx.fillStyle = pattern;
-      ctx.fillStyle = "blue";
+      // ctx.fillStyle = "blue";
       // ctx.fillRect (this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
       ctx.drawImage(this.image, this.sprite.imageX, this.sprite.imageY, this.sprite.width, this.sprite.height, this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
       // ctx.restore();
@@ -3958,17 +3958,35 @@ var Lakitu = function (_MovingObject) {
     var _this = _possibleConstructorReturn(this, (Lakitu.__proto__ || Object.getPrototypeOf(Lakitu)).call(this, options));
 
     _this.term = 3;
+
+    _this.safeWindow = 1500;
+    _this.toss = _this.toss.bind(_this);
+    _this.changeSprite = _this.changeSprite.bind(_this);
+    setTimeout(_this.toss, _this.safeWindow);
     return _this;
   }
 
   _createClass(Lakitu, [{
+    key: 'toss',
+    value: function toss() {
+      this.changeSprite();
+    }
+  }, {
     key: 'changeSprite',
     value: function changeSprite() {
       if (this.sprite === _images2.default.lakituA) {
         this.sprite = _images2.default.lakituAthrow;
+        this.setNewSafeWindow();
+        setTimeout(this.changeSprite, 650);
       } else {
         this.sprite = _images2.default.lakituA;
+        setTimeout(this.toss, this.safeWindow);
       }
+    }
+  }, {
+    key: 'setNewSafeWindow',
+    value: function setNewSafeWindow() {
+      this.safeWindow = (Math.floor(Math.random() * 4) + 1.2) * 400;
     }
   }, {
     key: 'move',
