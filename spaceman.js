@@ -13,8 +13,8 @@ const trueGame = ()=>{
 
 
   let ctx = view.getContext('2d');
-  const game = new Game();
-  const renderer = new Renderer(game, ctx);
+
+  const renderer = new Renderer(ctx);
 
   renderer.start(ctx);
 };

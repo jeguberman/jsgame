@@ -1535,8 +1535,8 @@ var trueGame = function trueGame() {
   view.height = _game2.default.HEIGHT;
 
   var ctx = view.getContext('2d');
-  var game = new _game2.default();
-  var renderer = new _renderer2.default(game, ctx);
+
+  var renderer = new _renderer2.default(ctx);
 
   renderer.start(ctx);
 };
@@ -1615,10 +1615,6 @@ var Game = function () {
       pos: [100, 105],
       game: this,
       sprite: _images2.default.lakituInit
-    }), new _spiny2.default({
-      pos: [180, 280],
-      game: this,
-      static: true
     })];
 
     this.player = this.allObjects[0];
@@ -4341,7 +4337,6 @@ var Lakitu = function (_MovingObject) {
     value: function move(velocityScale) {
       if (!this.game.gameOver) {
         this.keepInBoundary();
-
         this.vel = [this.vel[0] + velocityScale * this.acc[0], this.vel[1] + velocityScale * this.acc[1]];
         this.terminalVelocity();
         this.pos = [this.pos[0] + this.vel[0], this.pos[1] + this.vel[1]];
@@ -4363,31 +4358,42 @@ module.exports = Lakitu;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _game = __webpack_require__(35);
+
+var _game2 = _interopRequireDefault(_game);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Viewer = function () {
-  function Viewer(game, ctx) {
+  function Viewer(ctx) {
     _classCallCheck(this, Viewer);
 
-    this.game = game;
     this.ctx = ctx;
-    this.normalTimeDelta = 1000 / game.FPS;
+    this.game = new _game2.default();
+    this.normalTimeDelta = 1000 / this.game.FPS;
   }
 
   _createClass(Viewer, [{
-    key: "start",
+    key: 'start',
     value: function start() {
       this.lastTime = 0;
       requestAnimationFrame(this.animate.bind(this));
     }
   }, {
-    key: "animate",
+    key: 'renderGame',
+    value: function renderGame(velocityScale) {
+      this.game.step(velocityScale);
+      this.game.draw(this.ctx);
+    }
+  }, {
+    key: 'animate',
     value: function animate(time) {
       var timeDelta = time - this.lastTime;
       var idealDelta = 1000 / 60;
       var velocityScale = timeDelta / idealDelta;
-      this.game.step(velocityScale);
-      this.game.draw(this.ctx);
+      this.renderGame(velocityScale);
       this.lastTime = time;
       requestAnimationFrame(this.animate.bind(this));
     }
