@@ -12,7 +12,7 @@
 }
 
 body {
-   text-align:center;
+   text-align: center;
    /* background-image: url('../assets/cloudsbg.png'); */
    /* background-size: 100px; */
    background: radial-gradient(black,
@@ -20,6 +20,10 @@ body {
       black,
       black, gold);
    height: 100vh;
+}
+
+a{
+  text-decoration: none;
 }
 
 #title{
