@@ -8,13 +8,10 @@
   color: gold;
   font-family: Luckiest Guy;
   color: gold;
-  /* background: gray; */
 }
 
 body {
    text-align: center;
-   /* background-image: url('../assets/cloudsbg.png'); */
-   /* background-size: 100px; */
    background: radial-gradient(black,
       black,
       black,
