@@ -159,11 +159,25 @@ var Images = {
     height: 27
   },
 
+  marioFaceUp: {
+    imageX: 412,
+    imageY: 59,
+    width: 15,
+    height: 27
+  },
+
   marioJumpRight: {
     imageX: 145,
     imageY: 54,
     width: 16,
-    height: 29
+    height: 31
+  },
+
+  marioJumpLeft: {
+    imageX: 314,
+    imageY: 224,
+    width: 16,
+    height: 31
   },
 
   unitSquare: {
@@ -4017,10 +4031,11 @@ var Player = function (_MovingObject) {
     _this.Lbrake = true;
     _this.Rbrake = true;
     _this.breakConst = 0.75;
+    _this.leftFace = false;
 
     _this.image = new Image();
     _this.image.src = 'assets/mario_sprites.png';
-    _this.sprite = _images2.default.marioStandRight;
+    _this.sprite = _images2.default.marioFaceUp;
 
     _this.deathFall = _this.deathFall.bind(_this);
 
@@ -4084,7 +4099,11 @@ var Player = function (_MovingObject) {
     key: 'inJumpOn',
     value: function inJumpOn() {
       this.inJump = true;
-      this.changeSprite(_images2.default.marioJumpRight);
+      if (this.leftFace) {
+        this.changeSprite(_images2.default.marioJumpLeft);
+      } else {
+        this.changeSprite(_images2.default.marioJumpRight);
+      }
     }
   }, {
     key: 'outJump',
@@ -4093,19 +4112,30 @@ var Player = function (_MovingObject) {
         this.vel[1] = 0;
       }
       this.inJump = false;
-      this.changeSprite(_images2.default.marioStandRight);
+      if (this.leftFace) {
+        this.changeSprite(_images2.default.marioStandLeft);
+      } else {
+        this.changeSprite(_images2.default.marioStandRight);
+      }
     }
   }, {
     key: 'Lwalk',
     value: function Lwalk() {
-      this.changeSprite(_images2.default.marioStandLeft);
-      if (this.speedLessThanMaxGround) {
-        if (this.vel[0] > 0) {
-          this.vel[0] = 0.7;
+      if (!this.game.gameOver) {
+        if (this.inJump) {
+          this.changeSprite(_images2.default.marioJumpLeft);
+        } else {
+          this.changeSprite(_images2.default.marioStandLeft);
         }
-        this.acc[0] = this.walkAcc * -1;
+        if (this.speedLessThanMaxGround) {
+          if (this.vel[0] > 0) {
+            this.vel[0] = 0.7;
+          }
+          this.acc[0] = this.walkAcc * -1;
+        }
+        this.LbrakeOff();
+        this.leftFace = true;
       }
-      this.LbrakeOff();
     }
   }, {
     key: 'LbrakeOff',
@@ -4120,14 +4150,21 @@ var Player = function (_MovingObject) {
   }, {
     key: 'Rwalk',
     value: function Rwalk() {
-      this.changeSprite(_images2.default.marioStandRight);
-      if (this.speedLessThanMaxGround) {
-        if (this.vel[0] < 0) {
-          this.vel[0] = -0.7;
+      if (!this.game.gameOver) {
+        if (this.inJump) {
+          this.changeSprite(_images2.default.marioJumpRight);
+        } else {
+          this.changeSprite(_images2.default.marioStandRight);
         }
-        this.acc[0] = this.walkAcc;
+        if (this.speedLessThanMaxGround) {
+          if (this.vel[0] < 0) {
+            this.vel[0] = -0.7;
+          }
+          this.acc[0] = this.walkAcc;
+        }
+        this.RbrakeOff();
+        this.leftFace = false;
       }
-      this.RbrakeOff();
     }
   }, {
     key: 'RbrakeOff',
