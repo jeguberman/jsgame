@@ -5,14 +5,41 @@
   <title>
     Spaceman
   </title>
+  <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+   <link rel="stylesheet" href="styles/font-awesome-4.7.0/css/font-awesome.min.css">
+
+   <script src="bundle.js"></script>
+   <link href="./styles/style.css" rel='stylesheet' type='text/css'/>
 </head>
 <body>
-  <div id="coincount">f</div>
+  <div id="title">Collect the coins!</div>
+  <div id="author">by John Guberman</div>
+  <ul id="directions" class="ilb sidebar">
+    <li>Collect coins, but don't touch the spinies!</li>
+    <li>Controls</li>
+    <li>A or LEFT ARROW: Move left</li>
+    <li>D or RIGHT ARROW: Move Right</li>
+    <li>SPACE: Jump</li>
+  </ul>
   <canvas id="view"></canvas>
-  <script src="bundle.js"></script>
-  <link href="./styles/style.css" rel='stylesheet' type='text/css'>
+  <ul class="ilb sidebar">
+    <li>Links</li>
+    <li>
+      <a class="fa fa-github" href="https://github.com/jeguberman"></a>
+    </li>
+    <li>
+      <a class="fa fa-user-circle" href="https://johnguberman.com"></a>
+    </li>
+    <li>
+      <a class="fa fa-linkedin" href="https://github.com/jeguberman"></a>
+    </li>
+  </ul>
+  <div class="block-barrier"/>
+  <div class="score ilb">Score: </div>
+  <div class="score il" id="coincount">CountCountGoesHere</div>
 
-  </style>
+
 </body>
 </html>
