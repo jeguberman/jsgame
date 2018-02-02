@@ -20,13 +20,25 @@ const trueGame = ()=>{
 };
 
 const falseGame = () => {
-  // const stage = document.getElementById('view');
-  // stage.width = Game.WIDTH;
-  // stage.height = Game.HEIGHT;
-  //
-  // const ctx = stage.getContext('2d');
+  class Thing{
+    constructor(){
+      this.value = 2;
+    }
+  }
 
-  $("#coincount").append("free");
+  class ToInherit{
+    constructor(){
+      this.iVal = 9;
+      const me = this;
+    }
+
+    iAdd(){
+      console.log(this.val + this.iVal);
+    }
+
+    inh(obj){}
+
+  }
 
 
 
