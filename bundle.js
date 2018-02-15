@@ -1603,79 +1603,46 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //breadcrumbs: Elise said something about a single source of truth for state. Currently the sprite is just a store of animation data. I think what elise is getting at is closer to a redux cycle.
-
-//that is to say, the gameSpaceObject knows what the current frame and frame data is, passes that information to the sprite, and the sprite returns the frame data for the next state.
-
 var _merge = __webpack_require__(3);
 
 var _merge2 = _interopRequireDefault(_merge);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var Sprite = function Sprite(options) {
 
-var Sprite = function () {
-  function Sprite(options) {
-    _classCallCheck(this, Sprite);
+  var image = new Image();
+  image.src = options.src;
+  var animations = {};
 
-    // this.src = options.src;
-    this.src = new Image();
-    this.src.src = options.src;
-    this.animations = {};
-  }
-
-  _createClass(Sprite, [{
-    key: "hook",
-    value: function hook(owner) {
-      owner.sprite = this;
-      this.owner = owner;
-      this.state = this.owner.state;
-      this.faceRight = this.owner.faceRight;
-    }
-  }, {
-    key: "state",
-    value: function state() {
-      return this.owner.state;
-    }
-  }, {
-    key: "updateOwner",
-    value: function updateOwner() {
-      this.state = this.owner.state;
-      this.faceRight = this.owner.faceRight;
-    }
-  }, {
-    key: "set",
-    value: function set(cycle) {
-      this.animations[cycle.name] = cycle;
-    }
-  }, {
-    key: "get",
-    value: function get(string) {
-      return this.animations[string];
-    }
-  }, {
-    key: "step",
-    value: function step() {
-      var currentCel = this.animations[this.state].advance();
-      (0, _merge2.default)(this, currentCel);
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx) {
-      this.updateOwner();
+  return {
+    image: image,
+    animations: animations,
+    draw: function draw(ctx) {
       this.step();
       ctx.save();
       ctx.fillStyle = "red";
-      ctx.fillRect(this.owner.pos[0], this.owner.pos[1], this.width, this.height);
-      // debugger
-      ctx.drawImage(this.src, this.sX, this.sY, this.width, this.height, this.owner.pos[0], this.owner.pos[1], this.width, this.height);
+      ctx.fillRect(this.pos[0], this.pos[1], this.width, this.height);
+      ctx.drawImage(this.image, this.sX, this.sY, this.width, this.height, this.pos[0], this.pos[1], this.width, this.height);
       ctx.restore();
-    }
-  }]);
+    },
 
-  return Sprite;
-}();
+    set: function set(cycle) {
+      this.animations[cycle.name] = cycle;
+    },
+
+    get: function get(string) {
+      return this.animations[string];
+    },
+
+    step: function step() {
+      var currentCel = this.animations[this.state].advance();
+      (0, _merge2.default)(this, currentCel);
+    }
+  };
+}; //breadcrumbs: Elise said something about a single source of truth for state. Currently the sprite is just a store of animation data. I think what elise is getting at is closer to a redux cycle.
+
+//that is to say, the gameSpaceObject knows what the current frame and frame data is, passes that information to the sprite, and the sprite returns the frame data for the next state.
 
 exports.default = Sprite;
 
@@ -1899,8 +1866,6 @@ module.exports = Spiny;
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _game = __webpack_require__(17);
 
 var _game2 = _interopRequireDefault(_game);
@@ -1909,9 +1874,11 @@ var _renderer = __webpack_require__(108);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _merge = __webpack_require__(3);
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _merge2 = _interopRequireDefault(_merge);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // import Controllr from './lib/controller';
 var Util = __webpack_require__(110);
@@ -1931,32 +1898,59 @@ var trueGame = function trueGame() {
 };
 
 var falseGame = function falseGame() {
-  var Thing = function Thing() {
-    _classCallCheck(this, Thing);
 
-    this.value = 2;
+  // class AThing{
+  //   constructor(){
+  //     this.AVal = 1;
+  //   }
+  //   func(){
+  //     console.log("from A");
+  //   }
+  //   Afunc(){
+  //     console.log(this.AVAL);
+  //   }
+  // }
+
+
+  var BThing = function BThing() {
+    return {
+      BVAL: 2,
+      func: function func() {
+        console.log("from B");
+      },
+
+      Bfunc: function Bfunc() {
+        console.log(this.BVAL);
+      },
+
+      otherFunc: function otherFunc() {
+        this.Afunc();
+      }
+    };
   };
 
-  var ToInherit = function () {
-    function ToInherit() {
-      _classCallCheck(this, ToInherit);
+  var AThing = function AThing() {
+    return {
+      AVAL: "A",
+      func: function func() {
+        console.log("from A");
+      },
 
-      this.iVal = 9;
-      var me = this;
-    }
-
-    _createClass(ToInherit, [{
-      key: 'iAdd',
-      value: function iAdd() {
-        console.log(this.val + this.iVal);
+      Afunc: function Afunc() {
+        console.log(this.AVAL);
       }
-    }, {
-      key: 'inh',
-      value: function inh(obj) {}
-    }]);
+    };
+  };
 
-    return ToInherit;
-  }();
+  var a = new AThing();
+  var b = new BThing();
+  var ab = (0, _merge2.default)({}, a, b);
+  // ab.__proto__ = merge({},a.__proto__,b.__proto__);
+  var ap = a.__proto__;
+  var bp = b.__proto__;
+  var abp = Object.create({}, ap, bp);
+  // ab.func();
+  debugger;
 };
 
 var switcher = function switcher(n) {
@@ -4171,7 +4165,7 @@ var Player = function (_MovingObject) {
 
     var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, options));
 
-    _player_sprite2.default.hook(_this);
+    _this.hook(_player_sprite2.default);
     _this.state = "standRight";
 
     _this.jumpAcc = -15;
@@ -4188,14 +4182,9 @@ var Player = function (_MovingObject) {
   }
 
   _createClass(Player, [{
-    key: 'draw',
-    value: function draw(ctx) {
-      this.sprite.draw(ctx);
-      // ctx.save();
-      // ctx.fillStyle = this.color;
-      // // ctx.fillRect (this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
-      // ctx.drawImage(this.sprite.src, this.sprite.sX, this.sprite.sY, this.sprite.width, this.sprite.height, this.pos[0], this.pos[1], this.sprite.width, this.sprite.height);
-      // ctx.restore();
+    key: 'hook',
+    value: function hook(newThing) {
+      (0, _merge2.default)(this, newThing);
     }
   }, {
     key: 'gameOver',
